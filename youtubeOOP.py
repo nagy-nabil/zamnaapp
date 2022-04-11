@@ -7,24 +7,32 @@ class dn_youtube():
     def get_info(self):
         # 0 title ,1 length, 2 description 
         #return list of lists to generlize dataset
-        return [[self.yt_object.title, self.yt_object.length,self.yt_object.description]]
+        # return [[self.yt_object.title]] #return [[self.yt_object.title, self.yt_object.length,self.yt_object.description]]
+        return self.yt_object.title
+
     def set_streams(self):
         return {"video":self.yt_object.streams.filter(progressive=True).asc(),
         "audio":self.yt_object.streams.filter(only_audio=True,adaptive=True).asc()}
     def get_streams(self):
         return self.streams
+    #function to set on_progtress_callback function for the object
+    def set_progress_callback(self,fun):
+        self.yt_object.register_on_progress_callback(fun)
+        
+    #function to set on_complete_callback function for the object
+    def set_complete_callback(self,fun):
+        self.yt_object.register_on_complete_callback(fun)
     #choose stream and download it
-    def download_stream(self,key,check):
-        if check[0]=='1':
-            #download 720p video
-            if key=="720p":
-                self.yt_object.streams.filter(progressive=True,resolution="720p")[0].download()
-            #download 480p video
-            elif key=="360p":
-                self.yt_object.streams.filter(progressive=True,resolution="360p")[0].download()
-            # download audio with 160kbps
-            else:
-                self.yt_object.streams.filter(adaptive=True,only_audio=True,abr="160kbps")[0].download()
+    def download_stream(self,key):
+        #download 720p video
+        if key=="720p":
+            self.yt_object.streams.filter(progressive=True,resolution="720p")[0].download()
+        #download 480p video
+        elif key=="360p":
+            self.yt_object.streams.filter(progressive=True,resolution="360p")[0].download()
+        # download audio with 160kbps
+        else:
+            self.yt_object.streams.filter(adaptive=True,only_audio=True,abr="160kbps")[0].download()
 
 
 #you can get the list by playlist link or video link
@@ -32,6 +40,9 @@ class dn_youtube():
 class dn_playlist():
     def __init__(self, url):
         self.pl_object=Playlist(url);
+
+    def get_links(self):
+        return self.pl_object
     #return list of lists [playlist title, [video title , length , description]]
     def get_info(self):
         # temp=[self.pl_object.title]
