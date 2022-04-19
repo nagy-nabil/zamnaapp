@@ -5,7 +5,7 @@ CLIENT_ID = '50fb0ee5e03d43498b3ab59144557a44'
 CLIENT_SECRET = '93f75a80e0154f88800653abedc3ab37'
 #this path is mystery sorry
 AUTH_URL = 'https://accounts.spotify.com/api/token'
-access_token='BQBNQSHivhtfhLOkhSyYrd5ULgyosIIVLVNJkqmjD0r2KdwOh4qHxQGVEB7c952D4tn1oj8_AgGJBOuk18Ow_05psoD4MKOG'
+access_token='BQC8QMEjYDeqyUv-nrFA3y8vOY6CAh2-uEAITloYptCe75zcMZXVkzqTwjG3N9k8LVbPd0TAwl_UedaFl82ElPWwk53tS4cQ'
 class spotAPI():
     #for all requests
     headers = {
@@ -15,6 +15,7 @@ class spotAPI():
     def __init__(self,url):
         #to work with if all over the code
         self.id=spotAPI.get_id(url)
+        # self.get_access()
     
     #variable to keep track how many times api tried to get data and failed
     times=0
@@ -26,7 +27,8 @@ class spotAPI():
             self.times+=1
             self.get_access()
             self.request_track()
-            
+        if self.times==2:
+            return None
         self.times=0
         data=request.json()
         # print(data['name'], data['artists'][0]['name'])
@@ -38,7 +40,7 @@ class spotAPI():
     def request_album(self):
         #edit url for the request instead of editing headers dict
         request=requests.request("GET",api_url+ 'albums/' + self.id,headers=spotAPI.headers)
-        print(request.status_code)
+        # print(request.status_code)
         if request.status_code!=200 and self.times<2:
             self.times+=1
             self.get_access()
@@ -72,7 +74,7 @@ class spotAPI():
 
     #function to get the data returned by the api to youtube functions 
     #return list of search objects as general rule for track album playlist
-    #key instead of make more than function ['t' >track, 'a' > album, 'p' > playlist]
+    #key instead of make more than function ['t' ->track, 'a' -> album, 'p' -> playlist]
     def spot_to_youtube(self,key='t'):
         search_list=[]
         if key=='p':
@@ -120,11 +122,11 @@ class spotAPI():
         return url.split('/')[4].split("?")[0]
 
 if __name__ == "__main__":
+    print(access_token)
+    # spotAPI.get_access()
     # print(access_token)
-    spotAPI.get_access()
-    # print(access_token)
-    obj=spotAPI("https://open.spotify.com/playlist/4lEHJV6Ay39YqtJ0QVagCJ?si=3ec553ddf17543c1")
-    data=obj.request_playlist()
+    obj=spotAPI("https://open.spotify.com/track/00NAQYOP4AmWR549nnYJZu?si=8ff074290d1f4c13")
+    data=obj.request_track()
     print(data)
     # obj2=spotAPI("https://open.spotify.com/album/0gA0nZrZ55PLUp7ARfrICu?si=xIDc51q4SNSdDPLnyBO_Ag")
     # data2=obj2.request_album()

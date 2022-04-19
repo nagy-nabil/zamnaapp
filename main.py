@@ -52,12 +52,30 @@ class Worker(QObject):
                 self.search_progress.emit(title_temp)
                 # self.search_progress.emit(dn_youtube(video).get_info())
         elif self.index==2:
-            obj=dn_search(self.url)
-            objs_handler.append(obj)
-            title_temp=obj.get_info()
-            #emit title only
-            self.search_progress.emit(title_temp)
+            self.search_function(search_key=self.url)
+        elif self.index==3:#spotify track
+            obj=spotAPI(self.url)
+            titles_temp=obj.request_track()#list of data
+            if titles_temp:
+                for title in titles_temp:
+                    self.search_function(title)
+        elif self.index==4:
+            obj=spotAPI(self.url)
+            titles_temp=obj.request_playlist()#list of data
+            if titles_temp:
+                for title in titles_temp:
+                    self.search_function(title)
         self.finished.emit()
+
+    #function to do search will be used with search youtube and spotify->spotify will return list of data only
+    #emit video title
+    def search_function(self,search_key):
+        global objs_handler
+        obj=dn_search(search_key)#here search key not url 
+        objs_handler.append(obj)
+        title_temp=obj.get_info()
+        #emit title only
+        self.search_progress.emit(title_temp)
 
     #function to send singals of downlaod 
     def run_download(self):
@@ -94,8 +112,9 @@ class UI(QMainWindow):
         self.search_button=self.findChild(QPushButton,"search_button")
         self.from_spotify=self.findChild(QSpinBox,"from_spotify")
         self.loading_gif=self.findChild(QLabel,"loading_gif")
+        self.end_process_button=self.findChild(QPushButton,"end_process_button")
         # Loading the GIF
-        self.movie = QMovie("Spinner-1s-200px.gif")
+        self.movie = QMovie("images\\Spinner-1s-200px.gif")
         self.loading_gif.setMovie(self.movie)
         self.check_all=self.findChild(QCheckBox,"check_all")
         # self.pick_song=self.findChild(QCheckBox,"pick_song")
@@ -113,6 +132,7 @@ class UI(QMainWindow):
         self.check_all.stateChanged.connect(lambda:self.check_all_fun())#to excuate function when state of checkbutton change\
         self.search_button.clicked.connect(self.search_fun)
         self.download_button.clicked.connect(self.download_fun)
+        self.end_process_button.clicked.connect(self.restet_after_download)
         #show app
         self.show()
 
@@ -123,7 +143,8 @@ class UI(QMainWindow):
         self.check_all.hide()
         # self.pick_song.hide()
         self.download_frame.hide()
-        self.download_progress.hide()
+        self.end_process_button.hide()
+        # self.download_progress.hide()
 
     #function to show or hide from_Spotify when combobox change
     def combobox_change(self):
@@ -162,6 +183,7 @@ class UI(QMainWindow):
         self.check_all.setEnabled(True)
         self.verticalLayout.addWidget(self.download_frame)
         self.download_frame.show()
+        self.end_process_button.show()
 
     #function search go to worker thread and return objs data as finished signal
     def search_fun(self):
@@ -229,8 +251,9 @@ class UI(QMainWindow):
         self.worker.downloaded_one.connect(self.reset_progressbar)
         #start thread
         self.thread.start()
+        
         self.download_progress.show()
-        self.thread.finished.connect(lambda:self.download_progress.hide())
+        self.thread.finished.connect(self.restet_after_download)
     #function to ubdate progress bar value each time there's value
     def update_progressbar(self,value):
         self.download_progress.setProperty("value",value)
@@ -238,6 +261,30 @@ class UI(QMainWindow):
     #to reset progress bar to zero after the download for the next video
     def reset_progressbar(self):
         self.download_progress.setProperty("value",0)
+
+    #function to reset all program after download is finished
+    #will be used with end_process_button [because it's the same function]
+    def restet_after_download(self):
+        self.remove_from_area()
+        self.initialize()
+        self.which_download.setEnabled(True)
+        self.url_input.setEnabled(True)
+        self.url_input.setText('')
+        self.search_button.setEnabled(True)
+        self.download_frame.setEnabled(True)
+
+    #function to remove all tracks widgets from the scrollable area [from global tracks_check]
+    #and also remove their objects from objs_handler[global list]
+    def remove_from_area(self):
+        global tracks_check
+        global objs_handler
+        for track in range(len(tracks_check)):
+            tracks_check[track].deleteLater()
+        tracks_check.clear()
+        objs_handler.clear()
+
+        # print(len(tracks_check))
+
     #now to return only url(entry)
     def get_url(self):
             return  self.url_input.text().strip()
@@ -245,7 +292,9 @@ class UI(QMainWindow):
     
     
 if __name__ == "__main__":
+    
     import sys
     app = QApplication(sys.argv)
     ui = UI()
     sys.exit(app.exec_())
+    
