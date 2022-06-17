@@ -16,6 +16,7 @@
 - [ ] pause/stop download at any time
 - [ ] notification when the download is done
 - [ ] modern UI(user interface)
+- [ ] support 1080p resolution 
 
 ## tech
 - pytube
