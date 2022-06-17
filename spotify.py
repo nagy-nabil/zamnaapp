@@ -5,7 +5,7 @@ CLIENT_ID = '50fb0ee5e03d43498b3ab59144557a44'
 CLIENT_SECRET = '93f75a80e0154f88800653abedc3ab37'
 #this path is mystery sorry
 AUTH_URL = 'https://accounts.spotify.com/api/token'
-access_token='BQC8QMEjYDeqyUv-nrFA3y8vOY6CAh2-uEAITloYptCe75zcMZXVkzqTwjG3N9k8LVbPd0TAwl_UedaFl82ElPWwk53tS4cQ'
+access_token='BQA46U4a3Xy4cqmWZ81NTzaKnb_GHD_ix3GcoCuB84ucGeMNhwLmCdei341f95rPaGGCjYS7TkJtYMqvd0JYXvpVXbZkuCcmEuj7HafjcCkdxSTwAYNpkMqrE6cIW0TClQ'
 class spotAPI():
     #for all requests
     headers = {
@@ -123,11 +123,11 @@ class spotAPI():
 
 if __name__ == "__main__":
     print(access_token)
-    # spotAPI.get_access()
-    # print(access_token)
-    obj=spotAPI("https://open.spotify.com/track/00NAQYOP4AmWR549nnYJZu?si=8ff074290d1f4c13")
-    data=obj.request_track()
-    print(data)
+    spotAPI.get_access()
+    print(access_token)
+    # obj=spotAPI("https://open.spotify.com/track/00NAQYOP4AmWR549nnYJZu?si=8ff074290d1f4c13")
+    # data=obj.request_track()
+    # print(data)
     # obj2=spotAPI("https://open.spotify.com/album/0gA0nZrZ55PLUp7ARfrICu?si=xIDc51q4SNSdDPLnyBO_Ag")
     # data2=obj2.request_album()
     # print(data)

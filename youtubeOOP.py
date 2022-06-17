@@ -23,16 +23,16 @@ class dn_youtube():
     def set_complete_callback(self,fun):
         self.yt_object.register_on_complete_callback(fun)
     #choose stream and download it
-    def download_stream(self,key):
+    def download_stream(self,key,location=''):
         #download 720p video
         if key=="720p":
-            self.yt_object.streams.filter(progressive=True,resolution="720p")[0].download()
+            self.yt_object.streams.filter(progressive=True,resolution="720p")[0].download(location)
         #download 480p video
         elif key=="360p":
-            self.yt_object.streams.filter(progressive=True,resolution="360p")[0].download()
+            self.yt_object.streams.filter(progressive=True,resolution="360p")[0].download(location)
         # download audio with 160kbps
         else:
-            self.yt_object.streams.filter(adaptive=True,only_audio=True,abr="160kbps")[0].download()
+            self.yt_object.streams.filter(adaptive=True,only_audio=True,abr="160kbps")[0].download(location)
 
 
 #you can get the list by playlist link or video link

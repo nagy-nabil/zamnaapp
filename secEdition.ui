@@ -226,7 +226,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="1" column="0">
-          <widget class="QRadioButton" name="res360_downlaod">
+          <widget class="QRadioButton" name="res360_download">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -614,7 +614,7 @@
   <tabstop>search_button</tabstop>
   <tabstop>output_area</tabstop>
   <tabstop>check_all</tabstop>
-  <tabstop>res360_downlaod</tabstop>
+  <tabstop>res360_download</tabstop>
   <tabstop>res720_download</tabstop>
   <tabstop>audio_download</tabstop>
  </tabstops>

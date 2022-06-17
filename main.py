@@ -1,5 +1,5 @@
-from pydoc import importfile
-from PyQt5.QtWidgets import QMainWindow , QApplication, QComboBox, QLineEdit , QPushButton,QSpinBox, QCheckBox, QRadioButton, QProgressBar, QScrollArea, QFrame, QLabel
+from posixpath import expanduser
+from PyQt5.QtWidgets import QMainWindow , QApplication, QComboBox, QLineEdit , QPushButton,QSpinBox, QCheckBox, QRadioButton, QProgressBar, QScrollArea, QFrame, QLabel,QFileDialog
 from PyQt5.QtGui import QMovie
 from PyQt5 import uic
 from youtubeOOP import dn_playlist, dn_search,dn_youtube
@@ -7,9 +7,8 @@ from spotify import spotAPI
 from pytube import request
 from PyQt5.QtCore import QObject, QThread, pyqtSignal,QSize, QMutex
 from PyQt5.QtGui import QMovie
+from os import path
 request.default_range_size = 1048576*2   # this is for chunck size, 2MB size
-from time import sleep
-
 #empty list to carry all objects we create all objects of dn_youtube
 objs_handler=[]
 #empty list to carry all *QCheckBoxS* to give the user feature of choosing videos from playlist
@@ -19,10 +18,12 @@ tracks_check=[]
 
 #class that handels threads for search ing and downloading
 class Worker(QObject):
-    def __init__(self,url='',index=None):
+    def __init__(self,url=None,index=None,res=None,location=''):
         super().__init__()
         self.url=url
         self.index=index
+        self.res=res
+        self.location=location
     finished=pyqtSignal()
     search_progress=pyqtSignal(str)#to emit search result one by one (Emit string ->track info)
     download_progress=pyqtSignal(int)#to emit downloaded chunks for the progress bar
@@ -84,7 +85,7 @@ class Worker(QObject):
             if objs_handler[video]!=0:
                 objs_handler[video].set_progress_callback(self.progress_callback)
                 objs_handler[video].set_complete_callback(self.complete_callback)
-                objs_handler[video].download_stream("160")
+                objs_handler[video].download_stream(self.res,self.location)
         self.finished.emit()
 
     #function will be called each time youtube download chunk
@@ -236,11 +237,12 @@ class UI(QMainWindow):
     def download_fun(self):
         self.download_frame.setEnabled(False)
         self.get_choices()
+        
         self.download_thread()
     def download_thread(self):
         #init
         self.thread=QThread()
-        self.worker=Worker()
+        self.worker=Worker(res=self.get_res(),location=self.get_location())
         self.worker.moveToThread(self.thread)
         #signals
         self.thread.started.connect(self.worker.run_download)
@@ -289,8 +291,22 @@ class UI(QMainWindow):
     def get_url(self):
             return  self.url_input.text().strip()
 
+    #function to know the user quality choice 
+    def get_res(self):
+        if self.res360_download.isChecked():
+            return "360p"
+        if self.res720_download.isChecked():
+            return "720p"
+        if self.audio_download.isChecked():
+            return "160"
     
-    
+    #fucntion to know where the user want to save the files
+    def get_location(self):
+        fname=QFileDialog.getExistingDirectory(self,"choose folder","")
+        if fname:
+            return fname
+        else:
+            return f'{path.expanduser("~")}\Downloads\Video'
 if __name__ == "__main__":
     
     import sys
